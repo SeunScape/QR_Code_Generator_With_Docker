@@ -16,21 +16,33 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Set up Docker
-        run: sudo apt-get update && sudo apt-get install -y docker.io
+      - name: Set up Docker's official GPG key
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates curl
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+      - name: Add Docker repository to Apt sources
+        run: |
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+
+      - name: Install Docker
+        run: sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
       - name: Build Frontend Docker image
-        run: |
-          docker build -t front-end-nextjs ./front-end-nextjs
+        run: docker build -t front-end-nextjs ./front-end-nextjs
 
       - name: Build Backend Docker image
-        run: |
-          docker build -t api ./api
+        run: docker build -t api ./api
 
       - name: Run Frontend Container
-        run: |
-          docker run -d --name front-end-nextjs -p 3000:3000 front-end-nextjs
+        run: docker run -d --name front-end-nextjs -p 3000:3000 front-end-nextjs
 
       - name: Run Backend Container
-        run: |
-          docker run -d --name api -p 8000:8000 api
+        run: docker run -d --name api -p 8000:8000 api
