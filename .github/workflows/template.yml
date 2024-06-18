@@ -1,0 +1,36 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on pushes to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger the workflow on pull requests targeting the main branch
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        run: sudo apt-get update && sudo apt-get install -y docker.io
+
+      - name: Build Frontend Docker image
+        run: |
+          docker build -t front-end-nextjs ./front-end-nextjs
+
+      - name: Build Backend Docker image
+        run: |
+          docker build -t api ./api
+
+      - name: Run Frontend Container
+        run: |
+          docker run -d --name front-end-nextjs -p 3000:3000 front-end-nextjs
+
+      - name: Run Backend Container
+        run: |
+          docker run -d --name api -p 8000:8000 api
