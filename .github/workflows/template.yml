@@ -35,14 +35,23 @@ jobs:
       - name: Install Docker
         run: sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
       - name: Build Frontend Docker image
-        run: docker build -t front-end-nextjs ./front-end-nextjs
+        run: docker build -t riximages/front-end-nextjs:latest ./path/to/your/frontend
 
       - name: Build Backend Docker image
-        run: docker build -t api ./api
+        run: docker build -t riximages/api:latest ./path/to/your/backend
+
+      - name: Push Frontend Docker image
+        run: docker push riximages/front-end-nextjs:latest
+
+      - name: Push Backend Docker image
+        run: docker push riximages/api:latest
 
       - name: Run Frontend Container
-        run: docker run -d --name front-end-nextjs -p 3000:3000 front-end-nextjs
+        run: docker run -d --name front-end-nextjs -p 3000:3000 riximages/front-end-nextjs:latest
 
       - name: Run Backend Container
-        run: docker run -d --name api -p 8000:8000 api
+        run: docker run -d --name api -p 8000:8000 riximages/api:latest
