@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger the workflow on pushes to the main branch
+      - main  
   pull_request:
     branches:
       - main  # Trigger the workflow on pull requests targeting the main branch
